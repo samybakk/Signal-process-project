@@ -18,9 +18,8 @@ def norm (signal) :
 def framing(signal,shifting_step=16000,frames_size = 16000) :
 
     #signal : le signal qu'on veut frame
-    #Fs : fréquence d'échantillonage
-    #step : temps (en s) d'une frame
-
+    #shifting_step : la quantité d'échantillons dont on se déplace entre les débuts de chaque frames
+    #frames_size : la taille d'une frame en échantillons
 
     sig_size = len(signal)
     frames = []
