@@ -15,7 +15,7 @@ def norm (signal) :
 
     return signal / max_sig
 
-def framing(signal,Fs,step) :
+def framing(signal,shifting_step=16000,frames_size = 16000) :
 
     #signal : le signal qu'on veut frame
     #Fs : fréquence d'échantillonage
@@ -23,12 +23,9 @@ def framing(signal,Fs,step) :
 
 
     sig_size = len(signal)
-    sig_time = sig_size / Fs
-    shifting_step = step*Fs
-    frames_size = 5*Fs
     frames = np.empty()
     i=0
-    while true :
+    while True :
         if(i+frames_size <= sig_size):
             fr_act_size = i+frames_size
         else:
