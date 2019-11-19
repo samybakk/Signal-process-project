@@ -36,19 +36,32 @@ def framing(signal,shifting_step=16000,frames_size = 16000) :
     frames = np.array((frames))
     return frames
 
-def sig_energy(signal)
+def sig_energy(signal):
     totEnergy = 0
-    for i in range(0,len(signal))
-        totEnergy+=np.power(abs(signal[i],2))
+    for i in range(0,len(signal)) :
+        totEnergy+=np.power(abs(signal[i]),2)
     return totEnergy
 
 if __name__ == '__main__':
-    Fs = 1000
-    x = np.linspace(0,9999,10000)
-    signal = 2*np.sin(x/1000)
+    Fs = 250
+    x = np.linspace(0,999,1000)
+    signal = 2*np.sin(x)+np.cos(3*x)
+    plt.plot(signal)
+    plt.show()
     signal = norm(signal)
     frames= framing(signal,shifting_step=900,frames_size= Fs)
+    threshold = 200
+    autocorr = []
+
 
     for i in range(0, len(frames)) :
-        plt.plot(frames[i])
-        plt.show()
+        if sig_energy(frames[i]) < threshold :
+            autocorr.append(plt.xcorr(frames[i],frames[i],maxlags=50))
+
+
+        else :
+            f0 =0
+    autocorr = np.array(autocorr)
+    print(autocorr[0])
+    ''' plt.plot(frames[i])
+    plt.show()'''
