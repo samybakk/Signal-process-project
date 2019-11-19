@@ -24,7 +24,22 @@ def framing(signal,Fs,step) :
 
     sig_size = len(signal)
     sig_time = sig_size / Fs
-    nbr_frames = sig_time/step
+    shifting_step = step*Fs
+    frames_size = 5*Fs
+    frames = np.empty()
+    i=0
+    while true :
+        if(i+frames_size <= sig_size):
+            fr_act_size = i+frames_size
+        else:
+            fr_act_size = sig_size
+        frames+=signal[i:fr_act_size]
+        i+=shifting_step
+        if(i>sig_size):
+            break
+
+
+'''    nbr_frames = sig_time/step
     frames = np.array()
     for i in range(0,round(nbr_frames)) :
         if i != nbr_frames :
@@ -32,7 +47,7 @@ def framing(signal,Fs,step) :
 
         else :
             frame = 0
-        frames += frame
+        frames += frame'''
 if __name__ == '__main__':
     Fs = 16000
     x = np.linspace(0,99,1000)
