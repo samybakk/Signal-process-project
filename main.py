@@ -2,19 +2,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sc
 
+def norm (signal) :
+    sig_size = len(signal)
+    max_sig = 0
+    for i in range(0, sig_size):
+        if signal[i] > max_sig:
+            max_sig = signal[i]
+
+    return signal / max_sig
 
 
 if __name__ == '__main__':
 
-    x = np.linspace(0,99,100)
+    x = np.linspace(0,99,1000)
     sin = 2*sc.sin(x)
     signal = sin
-    max_sig = 0
-    plt.subplot(signal)
-    for i in signal :
-        if signal[i]> max_sig :
-            max_sig = signal[i]
 
-    signal = signal/max_sig
-    plt.subplot(signal)
+    plt.plot(signal)
     plt.show()
