@@ -46,8 +46,7 @@ if __name__ == '__main__':
     Fs = 250
     x = np.linspace(0,999,1000)
     signal = 2*np.sin(x)+np.cos(3*x)
-    plt.plot(signal)
-    plt.show()
+
     signal = norm(signal)
     frames= framing(signal,shifting_step=900,frames_size= Fs)
     threshold = 200
@@ -56,12 +55,16 @@ if __name__ == '__main__':
 
     for i in range(0, len(frames)) :
         if sig_energy(frames[i]) < threshold :
-            autocorr.append(plt.xcorr(frames[i],frames[i],maxlags=50))
+
+            a,b,c,d =plt.acorr(frames[i],maxlags=50)
+            autocorr.append(b)
 
 
         else :
             f0 =0
     autocorr = np.array(autocorr)
     print(autocorr[0])
+    plt.plot(autocorr[0])
+    plt.show()
     ''' plt.plot(frames[i])
     plt.show()'''
