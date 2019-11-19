@@ -36,6 +36,12 @@ def framing(signal,shifting_step=16000,frames_size = 16000) :
     frames = np.array((frames))
     return frames
 
+def sig_energy(signal)
+    totEnergy = 0
+    for i in range(0,len(signal))
+        totEnergy+=np.power(abs(signal[i],2))
+    return totEnergy
+
 if __name__ == '__main__':
     Fs = 1000
     x = np.linspace(0,9999,10000)
@@ -43,6 +49,6 @@ if __name__ == '__main__':
     signal = norm(signal)
     frames= framing(signal,shifting_step=900,frames_size= Fs)
 
-    for i in range (0,5) :
+    for i in range(0, len(frames)) :
         plt.plot(frames[i])
         plt.show()
