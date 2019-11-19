@@ -37,11 +37,12 @@ def framing(signal,shifting_step=16000,frames_size = 16000) :
     return frames
 
 if __name__ == '__main__':
-    Fs = 16000
-    x = np.linspace(0,99999,100000)
-    signal = 2*np.sin(x)
+    Fs = 1000
+    x = np.linspace(0,9999,10000)
+    signal = 2*np.sin(x/1000)
     signal = norm(signal)
-    frames= framing(signal)
+    frames= framing(signal,shifting_step=900,frames_size= Fs)
 
-    plt.plot(signal)
-    plt.show()
+    for i in range (0,5) :
+        plt.plot(frames[i])
+        plt.show()
