@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.signal as sc
 from scipy.signal import argrelextrema
+from scipy.io.wavfile import read
 
 
 def norm(signal):
@@ -21,28 +22,27 @@ def norm(signal):
 
 
 def framing(signal, shifting_step=2500, frames_size=2500):
-   '''
+    '''
    :param signal: le signal qu'on veut frame
    :param shifting_step: la quantité d'échantillons dont on se déplace entre les débuts de chaque frames
    :param frames_size: la taille d'une frame en échantillons
    :return: frames : array des frames
    '''
 
-
-   sig_size = len(signal)
-   frames = []
-   i = 0
-   while True:
-       if (i + frames_size <= sig_size):
-           fr_act_size = i + frames_size
-       else:
-           fr_act_size = sig_size
-       frames.append(signal[i:fr_act_size])
-       i += shifting_step
-       if (i >= sig_size):
-           break
-   frames = np.array(frames)
-   return frames
+    sig_size = len(signal)
+    frames = []
+    i = 0
+    while True:
+        if (i + frames_size <= sig_size):
+            fr_act_size = i + frames_size
+        else:
+            fr_act_size = sig_size
+        frames.append(signal[i:fr_act_size])
+        i += shifting_step
+        if (i >= sig_size):
+            break
+    frames = np.array(frames)
+    return frames
 
 
 def sig_energy(signal):
@@ -57,7 +57,7 @@ def sig_energy(signal):
     return totEnergy
 
 
-def pitch(frames, threshold=50, maxlags=50,printing=False):
+def pitch(frames, threshold=50, maxlags=50, printing=False):
     '''
     :param frames: frames dont on veut déterminer le pitch(fréquence fondamentale)
     :param threshold: Energie à partir de laquelle la frame est voiced
@@ -80,7 +80,7 @@ def pitch(frames, threshold=50, maxlags=50,printing=False):
                     loc_max.append(loc_max_temp[h] - maxlags)
 
             loc_max = np.array(loc_max)
-            if len(loc_max)>1:
+            if len(loc_max) > 1:
                 dist = 0
                 for j in range(0, len(loc_max) - 1):
                     dist += loc_max[j + 1] - loc_max[j]
@@ -111,19 +111,19 @@ def pitch(frames, threshold=50, maxlags=50,printing=False):
 
 
 if __name__ == '__main__':
-   Fs = 250
-   x = np.linspace(0, 1, 250)
+    Fs = 250
+    x = np.linspace(0, 1, 250)
 
-   signal = np.sin(16*x*np.pi-np.pi/2)+np.sin(32*np.pi*x)
+    rawfile = read("C://Users//frost//Documents//BA3//signal processing//arctic_a0001.wav")
 
-   sig_normed = norm(signal)
+    file = np.array(rawfile[1], dtype=float)
 
-   frames = framing(sig_normed)
+    # signal = np.sin(16*x*np.pi-np.pi/2)+np.sin(32*np.pi*x)
 
-   pitch = pitch(frames,printing=True)
+    sig_normed = norm(file)
 
+    frames = framing(sig_normed)
 
-
-
+    pitch = pitch(frames,printing=True)
 
 
