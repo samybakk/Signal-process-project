@@ -1,70 +1,129 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy as sc
+import scipy.signal as sc
+from scipy.signal import argrelextrema
 
-def norm (signal) :
 
-    #signal : le signal à normaliser
-
+def norm(signal):
+    '''
+    :param signal: le signal à normaliser
+    :return: sig_normed : signal normalisé
+    '''
 
     sig_size = len(signal)
     max_sig = 0
     for i in range(0, sig_size):
         if abs(signal[i]) > max_sig:
             max_sig = abs(signal[i])
+    sig_normed = signal / max_sig
 
-    return signal / max_sig
+    return sig_normed
 
-def framing(signal,shifting_step=16000,frames_size = 16000) :
 
-    #signal : le signal qu'on veut frame
-    #shifting_step : la quantité d'échantillons dont on se déplace entre les débuts de chaque frames
-    #frames_size : la taille d'une frame en échantillons
+def framing(signal, shifting_step=2500, frames_size=2500):
+   '''
+   :param signal: le signal qu'on veut frame
+   :param shifting_step: la quantité d'échantillons dont on se déplace entre les débuts de chaque frames
+   :param frames_size: la taille d'une frame en échantillons
+   :return: frames : array des frames
+   '''
 
-    sig_size = len(signal)
-    frames = []
-    i=0
-    while True :
-        if(i+frames_size <= sig_size):
-            fr_act_size = i+frames_size
-        else:
-            fr_act_size = sig_size
-        frames.append(signal[i:fr_act_size])
-        i+=shifting_step
-        if(i>sig_size):
-            break
-    frames = np.array((frames))
-    return frames
+
+   sig_size = len(signal)
+   frames = []
+   i = 0
+   while True:
+       if (i + frames_size <= sig_size):
+           fr_act_size = i + frames_size
+       else:
+           fr_act_size = sig_size
+       frames.append(signal[i:fr_act_size])
+       i += shifting_step
+       if (i >= sig_size):
+           break
+   frames = np.array(frames)
+   return frames
+
 
 def sig_energy(signal):
+    '''
+    :param signal: le signal dont on veut calculer l'énergie
+    :return: totEnergy : l'énergie du signal
+    '''
+
     totEnergy = 0
-    for i in range(0,len(signal)) :
-        totEnergy+=np.power(abs(signal[i]),2)
+    for i in range(0, len(signal)):
+        totEnergy += np.power(abs(signal[i]), 2)
     return totEnergy
 
+
+def pitch(frames, threshold=50, maxlags=50,printing=False):
+    '''
+    :param frames: frames dont on veut déterminer le pitch(fréquence fondamentale)
+    :param threshold: Energie à partir de laquelle la frame est voiced
+    :param maxlags: décallage max pour la convolution (xcorr)
+    :param printing : Booléen qui détermine si les graphiques sont affichés
+    :return: f0: liste des pitch des frames
+    '''
+    f0 = []
+    for i in range(0, len(frames)):
+        if sig_energy(frames[i]) > threshold:
+
+            a, b, c, d = plt.acorr(frames[i], maxlags=maxlags)
+
+            e = argrelextrema(b, np.greater)
+            loc_max_temp = np.array(e[0])
+            loc_max = []
+            for h in range(0, len(loc_max_temp)):
+                temp = loc_max_temp[h]
+                if b[temp] > 0:
+                    loc_max.append(loc_max_temp[h] - maxlags)
+
+            loc_max = np.array(loc_max)
+            if len(loc_max)>1:
+                dist = 0
+                for j in range(0, len(loc_max) - 1):
+                    dist += loc_max[j + 1] - loc_max[j]
+                dist = dist / (len(loc_max) - 1)
+                tps = dist / Fs
+                f0.append(1 / tps)
+
+                if printing:
+                    plt.subplot(2, 1, 1)
+                    plt.plot(frames[i])
+                    plt.grid(True)
+                    plt.axhline(0, color='black', lw=1)
+                    plt.title("frame " + str(i + 1))
+                    plt.subplot(2, 1, 2)
+                    plt.plot(a, b, 'r-')
+                    plt.grid(True)
+                    plt.axhline(0, color='black', lw=1)
+                    plt.title("fréquence fondamentale : " + str("%.2f" % f0[i]) + "Hz")
+                    plt.show()
+            else:
+                f0.append(0)
+
+
+        else:
+            f0.append(0)
+    f0 = np.array(f0)
+    return f0
+
+
 if __name__ == '__main__':
-    Fs = 250
-    x = np.linspace(0,999,1000)
-    signal = 2*np.sin(x)+np.cos(3*x)
+   Fs = 250
+   x = np.linspace(0, 1, 250)
 
-    signal = norm(signal)
-    frames= framing(signal,shifting_step=900,frames_size= Fs)
-    threshold = 200
-    autocorr = []
+   signal = np.sin(16*x*np.pi-np.pi/2)+np.sin(32*np.pi*x)
 
+   sig_normed = norm(signal)
 
-    for i in range(0, len(frames)) :
-        if sig_energy(frames[i]) < threshold :
+   frames = framing(sig_normed)
 
-            a,b,c,d =plt.acorr(frames[i],maxlags=50)
-            autocorr.append(b)
+   pitch = pitch(frames,printing=True)
 
 
-        else :
-            f0 =0
-    autocorr = np.array(autocorr)
-    print(autocorr[0])
-    plt.plot(autocorr[0])
-    plt.show()
-    ''' plt.plot(frames[i])
-    plt.show()'''
+
+
+
+
