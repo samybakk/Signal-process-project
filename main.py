@@ -3,6 +3,7 @@ import numpy as np
 import scipy.signal as sc
 from scipy.signal import argrelextrema
 from scipy.io.wavfile import read
+from scipy.io.wavfile import write
 import os
 import random
 
@@ -117,12 +118,12 @@ def pitch(frames,Fs, threshold=20, maxlags=800000, printing=False):
     f0 = np.array(f0)
     return f0
 
-def highPassFilter(signal, preamphaStep)
+def highPassFilter(signal, preamplasisStep = 0.67) :
     sig_size = len(signal)
     filteredSig = []
     filteredSig.append(0)
-    for i in range(1,sig_size-1)
-        filteredSig.append(x[i]−xpreamphaStep*x[i-1])
+    for i in range(1,sig_size-1) :
+        filteredSig.append(signal[i]-preamplasisStep*signal[i-1])
     filteredSig = np.array(filteredSig)
     return filteredSig
 
@@ -144,6 +145,12 @@ if __name__ == '__main__':
 
     frames = framing(sig_normed,round(Fs/100),round(Fs/30))
 
-    pitch = pitch(frames,Fs,maxlags=round(Fs/50),printing=False)
+    pitc = pitch(frames,Fs,maxlags=round(Fs/50),printing=False)
+    filteredSig = highPassFilter(sig_normed )
+    plt.plot(filteredSig)
+    plt.grid()
+    plt.show()
+    write("raw.wav",Fs, sig_normed)
+    write("filtered.wav",Fs, filteredSig)
 
 
