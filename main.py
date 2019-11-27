@@ -57,7 +57,7 @@ def sig_energy(signal):
     return totEnergy
 
 
-def pitch(frames, threshold=50, maxlags=50, printing=False):
+def pitch(frames,Fs, threshold=100, maxlags=800000, printing=False):
     '''
     :param frames: frames dont on veut déterminer le pitch(fréquence fondamentale)
     :param threshold: Energie à partir de laquelle la frame est voiced
@@ -67,6 +67,7 @@ def pitch(frames, threshold=50, maxlags=50, printing=False):
     '''
     f0 = []
     for i in range(0, len(frames)):
+        print(sig_energy(frames[i]))
         if sig_energy(frames[i]) > threshold:
 
             a, b, c, d = plt.acorr(frames[i], maxlags=maxlags)
@@ -74,10 +75,12 @@ def pitch(frames, threshold=50, maxlags=50, printing=False):
             e = argrelextrema(b, np.greater)
             loc_max_temp = np.array(e[0])
             loc_max = []
+            maxt=0
             for h in range(0, len(loc_max_temp)):
                 temp = loc_max_temp[h]
-                if b[temp] > 0:
+                if b[temp] > maxt :
                     loc_max.append(loc_max_temp[h] - maxlags)
+                    maxt = b[temp]
 
             loc_max = np.array(loc_max)
             if len(loc_max) > 1:
@@ -93,7 +96,7 @@ def pitch(frames, threshold=50, maxlags=50, printing=False):
                     plt.plot(frames[i])
                     plt.grid(True)
                     plt.axhline(0, color='black', lw=1)
-                    plt.title("frame " + str(i + 1))
+                    plt.title("frame " + str(i + 1) +'(E = '+str("%.2f" %sig_energy(frames[i]))+')')
                     plt.subplot(2, 1, 2)
                     plt.plot(a, b, 'r-')
                     plt.grid(True)
@@ -111,19 +114,19 @@ def pitch(frames, threshold=50, maxlags=50, printing=False):
 
 
 if __name__ == '__main__':
-    Fs = 250
+
     x = np.linspace(0, 1, 250)
 
-    rawfile = read("C://Users//frost//Documents//BA3//signal processing//arctic_a0001.wav")
+    Fs,rawfile = read("C://Users//frost//Documents//BA3//signal processing//arctic_a0001.wav")
 
-    file = np.array(rawfile[1], dtype=float)
+    file = np.array(rawfile, dtype=float)
 
     # signal = np.sin(16*x*np.pi-np.pi/2)+np.sin(32*np.pi*x)
 
     sig_normed = norm(file)
 
-    frames = framing(sig_normed)
+    frames = framing(sig_normed,16000,16000)
 
-    pitch = pitch(frames,printing=True)
+    pitch = pitch(frames,Fs,maxlags=round(Fs/50),printing=True)
 
 
