@@ -6,6 +6,7 @@ from scipy.io.wavfile import read
 from scipy.io.wavfile import write
 import os
 import random
+from scikit_talkbox_lpc import lpc_ref
 
 
 def norm(signal):
@@ -60,11 +61,11 @@ def sig_energy(signal):
     return totEnergy
 
 
-def pitch(frames,Fs, threshold=20, maxlags=800000, printing=False):
+def pitch(frames,Fs, threshold=100, maxlags=800000, printing=False,hamming =False):
     '''
     :param frames: frames dont on veut déterminer le pitch(fréquence fondamentale)
     :param threshold: Energie à partir de laquelle la frame est voiced
-    :param maxlags: décallage max pour la convolution (xcorr)
+    :param maxlags: décallage max pour la convolution (xcorr/acorr)
     :param printing : Booléen qui détermine si les graphiques sont affichés
     :return: f0: liste des pitch des frames
     '''
@@ -75,8 +76,10 @@ def pitch(frames,Fs, threshold=20, maxlags=800000, printing=False):
             ham= np.hamming(len(frames[i]))
             hammered = frames[i]*ham
 
-            a, b, c, d = plt.acorr(hammered, maxlags=maxlags)
-            #a, b, c, d = plt.acorr(frames[i], maxlags=maxlags) #we only need b, aka the autocorrelation vector
+            if hamming==True :
+                a, b, c, d = plt.acorr(hammered, maxlags=maxlags)
+            else:
+                a, b, c, d = plt.acorr(frames[i], maxlags=maxlags) #we only need b, aka the autocorrelation vector
 
             e = argrelextrema(b, np.greater)  #Local maximum of b, the autocorrelation vector
             loc_max_temp = np.array(e[0]) #temp list
@@ -118,43 +121,41 @@ def pitch(frames,Fs, threshold=20, maxlags=800000, printing=False):
     f0 = np.array(f0)
     return f0
 
-def highPassFilter(signal, preamplasisStep = 0.67) :
+def highPassFilter(signal, preamphaStep=0.67) :
     sig_size = len(signal)
     filteredSig = []
     filteredSig.append(0)
     for i in range(1,sig_size-1) :
-        filteredSig.append(signal[i]-preamplasisStep*signal[i-1])
+        filteredSig.append(signal[i]-preamphaStep*signal[i-1])
     filteredSig = np.array(filteredSig)
     return filteredSig
 
 if __name__ == '__main__':
 
+    path = "C://Users//frost//Documents//BA3//signal processing//sig//"
 
-    path = "C://Users//Danzig//PycharmProjects//Signal-process-project//orig//"
+    randomfile = random.choice(os.listdir(path))
 
-    fileList = []
-    for i in range(0,5) :
-        randomfile = random.choice(os.listdir(path))
-        Fs, rawfile = read(path+randomfile)
-        fileList.append(np.array(rawfile, dtype=float))
+    Fs, rawfile = read(path+randomfile)
 
-    sig_normed = norm(fileList[0])
+    file = np.array(rawfile, dtype=float)
 
+    sig_normed = norm(file)
+    plt.plot(rawfile)
+    plt.grid()
+    plt.show()
 
     frames = framing(sig_normed,round(Fs/100),round(Fs/30))
 
     pitc = pitch(frames,Fs,maxlags=round(Fs/50),printing=False)
 
-
     filteredSig = highPassFilter(sig_normed )
-    plt.subplot(2,1,1)
-    plt.plot(sig_normed)
-    plt.grid()
-    plt.subplot(2,1,2)
+
     plt.plot(filteredSig)
     plt.grid()
     plt.show()
-    write("raw.wav",Fs, sig_normed)
-    write("filtered.wav",Fs, filteredSig)
+
+
+    p = pitch(frames,Fs,maxlags=round(Fs/50),printing=True,hamming=False)
 
 
