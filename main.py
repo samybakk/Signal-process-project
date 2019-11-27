@@ -59,7 +59,7 @@ def sig_energy(signal):
     return totEnergy
 
 
-def pitch(frames,Fs, threshold=100, maxlags=800000, printing=False):
+def pitch(frames,Fs, threshold=20, maxlags=800000, printing=False):
     '''
     :param frames: frames dont on veut déterminer le pitch(fréquence fondamentale)
     :param threshold: Energie à partir de laquelle la frame est voiced
@@ -69,9 +69,13 @@ def pitch(frames,Fs, threshold=100, maxlags=800000, printing=False):
     '''
     f0 = []
     for i in range(0, len(frames)):
-        if sig_energy(frames[i]) > threshold:
 
-            a, b, c, d = plt.acorr(frames[i], maxlags=maxlags) #we only need b, aka the autocorrelation vector
+        if sig_energy(frames[i]) > threshold:
+            ham= np.hamming(len(frames[i]))
+            hammered = frames[i]*ham
+
+            a, b, c, d = plt.acorr(hammered, maxlags=maxlags)
+            #a, b, c, d = plt.acorr(frames[i], maxlags=maxlags) #we only need b, aka the autocorrelation vector
 
             e = argrelextrema(b, np.greater)  #Local maximum of b, the autocorrelation vector
             loc_max_temp = np.array(e[0]) #temp list
@@ -116,22 +120,23 @@ def pitch(frames,Fs, threshold=100, maxlags=800000, printing=False):
 
 if __name__ == '__main__':
 
-    x = np.linspace(0, 1, 250)
-
     #rawfile = read("C://Users//frost//Documents//BA3//signal processing//arctic_a0001.wav")
 
-
-
     # signal = np.sin(16*x*np.pi-np.pi/2)+np.sin(32*np.pi*x)
-    path = "C://Users//Danzig//PycharmProjects//Signal-process-project//orig//"
+
+    path = "C://Users//frost//Documents//BA3//signal processing//sig//"
 
     randomfile = random.choice(os.listdir(path))
+
     print(path+randomfile)
     Fs, rawfile = read(path+randomfile)
-    file = np.array(rawfile[1], dtype=float)
+    print(rawfile)
+    file = np.array(rawfile, dtype=float)
 
     sig_normed = norm(file)
 
-    frames = framing(sig_normed,16000,16000)
+    frames = framing(sig_normed,round(16000/100),round(16000/30))
 
-    pitch = pitch(frames,Fs,printing=True)
+    pitch = pitch(frames,Fs,maxlags=round(Fs/50),printing=True)
+
+
