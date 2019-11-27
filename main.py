@@ -148,15 +148,13 @@ if __name__ == '__main__':
     frames = framing(sig_normed,round(Fs/100),round(Fs/30))
 
     pitc = pitch(frames,Fs,maxlags=round(Fs/50),printing=False)
+
     filteredSig = highPassFilter(sig_normed )
+
     plt.plot(filteredSig)
     plt.grid()
     plt.show()
-    write("raw.wav",Fs, sig_normed)
-    write("filtered.wav",Fs, filteredSig)
-    for i in range(0,len(frames)):
-        plt.plot(highPassFilter(frames[i]))
-        plt.show()
+
 
     p = pitch(frames,Fs,maxlags=round(Fs/50),printing=True,hamming=False)
 
