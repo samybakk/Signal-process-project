@@ -135,7 +135,7 @@ if __name__ == '__main__':
 
     sig_normed = norm(file)
 
-    frames = framing(sig_normed,round(16000/100),round(16000/30))
+    frames = framing(sig_normed,round(Fs/100),round(Fs/30))
 
     pitch = pitch(frames,Fs,maxlags=round(Fs/50),printing=True)
 
