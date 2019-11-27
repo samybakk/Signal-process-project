@@ -117,26 +117,33 @@ def pitch(frames,Fs, threshold=20, maxlags=800000, printing=False):
     f0 = np.array(f0)
     return f0
 
+def highPassFilter(signal, preamphaStep)
+    sig_size = len(signal)
+    filteredSig = []
+    filteredSig.append(0)
+    for i in range(1,sig_size-1)
+        filteredSig.append(x[i]−xpreamphaStep*x[i-1])
+    filteredSig = np.array(filteredSig)
+    return filteredSig
 
 if __name__ == '__main__':
 
-    #rawfile = read("C://Users//frost//Documents//BA3//signal processing//arctic_a0001.wav")
 
-    # signal = np.sin(16*x*np.pi-np.pi/2)+np.sin(32*np.pi*x)
+    path = "C://Users//Danzig//PycharmProjects//Signal-process-project//orig//"
 
-    path = "C://Users//frost//Documents//BA3//signal processing//sig//"
+    fileList = []
+    for i in range(0,5) :
+        randomfile = random.choice(os.listdir(path))
+        Fs, rawfile = read(path+randomfile)
+        fileList.append(np.array(rawfile, dtype=float))
 
-    randomfile = random.choice(os.listdir(path))
-
-    print(path+randomfile)
-    Fs, rawfile = read(path+randomfile)
-    print(rawfile)
-    file = np.array(rawfile, dtype=float)
-
-    sig_normed = norm(file)
+    sig_normed = norm(fileList[0])
+    plt.plot(rawfile)
+    plt.grid()
+    plt.show()
 
     frames = framing(sig_normed,round(Fs/100),round(Fs/30))
 
-    pitch = pitch(frames,Fs,maxlags=round(Fs/50),printing=True)
+    pitch = pitch(frames,Fs,maxlags=round(Fs/50),printing=False)
 
 
