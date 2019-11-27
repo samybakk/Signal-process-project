@@ -139,14 +139,18 @@ if __name__ == '__main__':
         fileList.append(np.array(rawfile, dtype=float))
 
     sig_normed = norm(fileList[0])
-    plt.plot(rawfile)
-    plt.grid()
-    plt.show()
+
 
     frames = framing(sig_normed,round(Fs/100),round(Fs/30))
 
     pitc = pitch(frames,Fs,maxlags=round(Fs/50),printing=False)
+
+
     filteredSig = highPassFilter(sig_normed )
+    plt.subplot(2,1,1)
+    plt.plot(sig_normed)
+    plt.grid()
+    plt.subplot(2,1,2)
     plt.plot(filteredSig)
     plt.grid()
     plt.show()
