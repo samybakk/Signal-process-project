@@ -154,8 +154,15 @@ if __name__ == '__main__':
     plt.plot(filteredSig)
     plt.grid()
     plt.show()
+    lpc = []
 
+    for i in range(0,len(frames)):
+        for j in range(0,10) :
+            temp = lpc_ref(frames[i],order=j)
+            print(temp)
 
+        lpc.append(temp)
+    lpc = np.array((lpc))
     p = pitch(frames,Fs,maxlags=round(Fs/50),printing=True,hamming=False)
 
 
