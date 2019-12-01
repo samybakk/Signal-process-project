@@ -7,6 +7,7 @@ from scipy.io.wavfile import write
 import os
 import random
 from scikit_talkbox_lpc import lpc_ref
+import math
 
 
 def norm(signal):
@@ -67,19 +68,21 @@ def pitch(frames,Fs, threshold=100, maxlags=800000, printing=False,hamming =Fals
     :param threshold: Energie à partir de laquelle la frame est voiced
     :param maxlags: décallage max pour la convolution (xcorr/acorr)
     :param printing : Booléen qui détermine si les graphiques sont affichés
+    :param hamming : Booléen qui détermine si une hamming Window est appliquée aux frames
     :return: f0: liste des pitch des frames
     '''
     f0 = []
     for i in range(0, len(frames)):
 
         if sig_energy(frames[i]) > threshold:
-            ham= np.hamming(len(frames[i]))
-            hammered = frames[i]*ham
+
 
             if hamming==True :
-                a, b, c, d = plt.acorr(hammered, maxlags=maxlags)
+                ham = np.hamming(len(frames[i]))
+                hammered = frames[i] * ham
+                a, b, *_ = plt.acorr(hammered, maxlags=maxlags)
             else:
-                a, b, c, d = plt.acorr(frames[i], maxlags=maxlags) #we only need b, aka the autocorrelation vector
+                a, b, *_ = plt.acorr(frames[i], maxlags=maxlags) #we only need b, aka the autocorrelation vector
 
             e = argrelextrema(b, np.greater)  #Local maximum of b, the autocorrelation vector
             loc_max_temp = np.array(e[0]) #temp list
@@ -130,6 +133,24 @@ def highPassFilter(signal, preamphaStep=0.67) :
     filteredSig = np.array(filteredSig)
     return filteredSig
 
+def formant (frames):
+
+    formanttab = []
+    for i in range(0, len(frames)):
+        filt_frame = highPassFilter(frames[i])
+        temp = lpc_ref(filt_frame, order=10)
+        lpc = np.roots(temp)
+        lpc = lpc[np.imag(lpc) >= 0]
+        formanttabframes = []
+        for j in range (0,len(lpc)) :
+            angle = math.atan2(np.imag(lpc[j]),np.real(lpc[j]))
+            freq =(Fs/2*np.pi)*angle
+            formanttabframes.append(freq)
+            formanttabframes.sort()
+        formanttab.append(np.array(formanttabframes))
+    formanttab = np.array(formanttab)
+
+    return formanttab
 if __name__ == '__main__':
 
     path = "C://Users//frost//Documents//BA3//signal processing//sig//"
@@ -141,28 +162,12 @@ if __name__ == '__main__':
     file = np.array(rawfile, dtype=float)
 
     sig_normed = norm(file)
-    plt.plot(rawfile)
-    plt.grid()
-    plt.show()
 
     frames = framing(sig_normed,round(Fs/100),round(Fs/30))
 
-    pitc = pitch(frames,Fs,maxlags=round(Fs/50),printing=False)
+    p = pitch(frames,Fs,maxlags=round(Fs/50))
 
-    filteredSig = highPassFilter(sig_normed )
-
-    plt.plot(filteredSig)
-    plt.grid()
-    plt.show()
-    lpc = []
-
-    for i in range(0,len(frames)):
-        for j in range(0,10) :
-            temp = lpc_ref(frames[i],order=j)
-            print(temp)
-
-        lpc.append(temp)
-    lpc = np.array((lpc))
-    p = pitch(frames,Fs,maxlags=round(Fs/50),printing=True,hamming=False)
+    f = formant (frames)
+    print(f)
 
 
