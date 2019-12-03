@@ -145,9 +145,11 @@ def formant (frames):
         for j in range (0,len(lpc)) :
             angle = math.atan2(np.imag(lpc[j]),np.real(lpc[j]))
             freq =(Fs/2*np.pi)*angle
-            formanttabframes.append(freq)
-            formanttabframes.sort()
-        formanttab.append(np.array(formanttabframes))
+            if (freq<20000 and freq>500):
+                formanttabframes.append(freq)
+
+        formanttabframes.sort()
+        formanttab.append(formanttabframes)
     formanttab = np.array(formanttab)
 
     return formanttab
