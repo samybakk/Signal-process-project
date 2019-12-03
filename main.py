@@ -66,7 +66,7 @@ def sig_energy(signal):
     return totEnergy
 
 
-def pitch(frames,Fs, threshold=100, maxlags=800000, printing=False,hamming =False):
+def pitch(frames,Fs, threshold=10, maxlags=800000, printing=False):
     '''
     :param frames: frames dont on veut déterminer le pitch(fréquence fondamentale)
     :param threshold: Energie à partir de laquelle la frame est voiced
@@ -101,7 +101,7 @@ def pitch(frames,Fs, threshold=100, maxlags=800000, printing=False,hamming =Fals
                 tps = dist / Fs
                 f0.append(1 / tps)
 
-                if printing:
+                if printing==True:
                     plt.subplot(2, 1, 1)
                     plt.plot(frames[i])
                     plt.grid(True)
@@ -125,11 +125,14 @@ def pitch(frames,Fs, threshold=100, maxlags=800000, printing=False,hamming =Fals
 def highPassFilter(signal, preamphaStep=0.67) :
     sig_size = len(signal)
     filteredSig = []
-    filteredSig.append(0)
-    for i in range(1,sig_size-1) :
-        filteredSig.append(signal[i]-preamphaStep*signal[i-1])
+    for i in range(0,sig_size-1) :
+        if i>0 :
+            filteredSig.append(signal[i]-preamphaStep*signal[i-1])
+        else :
+            filteredSig.append(signal[i])
     filteredSig = np.array(filteredSig)
     return filteredSig
+
 
 
 def formant (frames):
@@ -157,21 +160,39 @@ def formant (frames):
     return formanttab
 if __name__ == '__main__':
 
-    path = "C://Users//frost//Documents//BA3//signal processing//sig//"
+    pathM = "C://Users//frost//Documents//BA3//signal processing//sig//male//"
+    pathF = "C://Users//frost//Documents//BA3//signal processing//sig//female//"
 
-    randomfile = random.choice(os.listdir(path))
+    filesM = []
+    filesF = []
+    for i in range(15) :
+        fileM = random.choice(os.listdir(pathM))
+        fileF = random.choice(os.listdir(pathF))
 
-    Fs, rawfile = read(path+randomfile)
+        Fs, rawfileM = read(pathM+fileM)
+        Fs2, rawfileF = read(pathF+fileF)
 
-    file = np.array(rawfile, dtype=float)
+        filesM.append(rawfileM, dtype=float)
+        filesF.append(rawfileF, dtype=float)
 
-    sig_normed = norm(file)
+    filesM = np.array(filesM)
+    filesF = np.array(filesF)
 
-    frames = framing(sig_normed,round(Fs/100),round(Fs/30),hamming= True)
+    filesMNormed = norm(filesM)
+    filesFNormed = norm(filesF)
 
-    p = pitch(frames,Fs,maxlags=round(Fs/50))
+    framesM = framing(filesM,round(Fs/100),round(Fs/30),hamming= True)
+    framesF = framing(filesF,round(Fs/100),round(Fs/30),hamming= True)
 
-    f = formant(frames)
-    print (f)
+    pitchM = pitch(framesM,Fs,maxlags = round(Fs/50))
+    pitchF = pitch(framesF,Fs,maxlags = round(Fs/50))
+
+    formantM = formant(framesM)
+    formantF = formant(framesF)
+
+
+
+
+
 
 
