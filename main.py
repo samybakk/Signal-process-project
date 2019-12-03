@@ -165,7 +165,7 @@ if __name__ == '__main__':
 
     filesM = []
     filesF = []
-    for i in range(15) :
+    for i in range(2) :
         file = random.choice(os.listdir(pathM))
 
         Fs, rawfileM = read(pathM+file)
@@ -206,7 +206,23 @@ if __name__ == '__main__':
 
     resultM = [filesMNormed,framesM,pitchM]
     resultF = [filesFNormed,framesF,pitchF]
-    print('ocuouc')
+
+    moypitchM = 0
+    moypitchF = 0
+    M =0
+    F =0
+    for j in range (len(pitchM[0])) :
+        if pitchM[0][j] != 0:
+            moypitchM += pitchM[0][j]
+            M = M+1
+            print(M)
+        if pitchF[0][j] != 0:
+            moypitchF += pitchF[0][j]
+            F = F+1
+    moypitchM = moypitchM/M
+    moypitchF = moypitchF/F
+    print('male :',moypitchM)
+    print('female :',moypitchF)
 
 
 
