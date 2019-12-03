@@ -179,22 +179,34 @@ if __name__ == '__main__':
 
     filesMNormed = []
     filesFNormed = []
+    framesMtemp =[]
+    framesFtemp =[]
+    framesM = []
+    framesF = []
+    pitchM = []
+    pitchF = []
+    formantM = []
+    formantF = []
+    resultM = []
+    resultF = []
     for i in range(len(filesM)) :
         filesMNormed.append(norm(filesM[i]))
         filesFNormed.append(norm(filesF[i]))
 
-        framesM = framing(filesMNormed,round(Fs/100),round(Fs/30),hamming= True)
-        framesF = framing(filesFNormed,round(Fs/100),round(Fs/30),hamming= True)
-        framesM = framesM[0]
-        framesF = framesF[0]
+        framesMtemp.append(framing(filesMNormed[i],round(Fs/100),round(Fs/30),hamming= True))
+        framesFtemp.append(framing(filesFNormed[i],round(Fs/100),round(Fs/30),hamming= True))
+        framesM.append(framesMtemp[0])
+        framesF.append(framesFtemp[0])
 
-        pitchM = pitch(framesM,Fs,maxlags = round(Fs/50))
-        pitchF = pitch(framesF,Fs,maxlags = round(Fs/50))
+        pitchM.append(pitch(framesM[i],Fs,maxlags = round(Fs/50)))
+        pitchF.append(pitch(framesF[i],Fs,maxlags = round(Fs/50)))
 
-    formantM = formant(framesM)
-    formantF = formant(framesF)
+        #formantM.append(formant(framesM[i]))
+        #formantF.append(formant(framesF[i]))
 
-
+    resultM = [filesMNormed,framesM,pitchM]
+    resultF = [filesFNormed,framesF,pitchF]
+    print('ocuouc')
 
 
 
