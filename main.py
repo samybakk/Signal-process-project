@@ -18,10 +18,10 @@ def norm(signal):
 
     sig_size = len(signal)
     max_sig = 0
-    for i in range(0, sig_size):
+    for i in range(0, sig_size): #on trouve le maximum global du signal
         if abs(signal[i]) > max_sig:
             max_sig = abs(signal[i])
-    sig_normed = signal / max_sig
+    sig_normed = signal / max_sig #on divise par le maximum global
 
     return sig_normed
 
@@ -156,7 +156,7 @@ def formant (frames):
     return formanttab
 if __name__ == '__main__':
 
-    path = "C://Users//frost//Documents//BA3//signal processing//sig//"
+    path = ""
 
     randomfile = random.choice(os.listdir(path))
 
@@ -170,7 +170,7 @@ if __name__ == '__main__':
 
     p = pitch(frames,Fs,maxlags=round(Fs/50))
 
-    f = formant (frames)
+    f = formant(frames)
     print(f)
 
 
