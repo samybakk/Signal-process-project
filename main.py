@@ -26,7 +26,7 @@ def norm(signal):
     return sig_normed
 
 
-def framing(signal, shifting_step=2500, frames_size=2500):
+def framing(signal, shifting_step=2500, frames_size=2500,hamming = True):
     '''
    :param signal: le signal qu'on veut frame
    :param shifting_step: la quantité d'échantillons dont on se déplace entre les débuts de chaque frames
@@ -47,6 +47,10 @@ def framing(signal, shifting_step=2500, frames_size=2500):
         if (i >= sig_size):
             break
     frames = np.array(frames)
+    if hamming == True:
+        for i in range (0,len(frames)):
+            ham = np.hamming(len(frames[i]))
+            frames[i] = frames[i] * ham
     return frames
 
 
@@ -76,13 +80,7 @@ def pitch(frames,Fs, threshold=100, maxlags=800000, printing=False,hamming =Fals
 
         if sig_energy(frames[i]) > threshold:
 
-
-            if hamming==True :
-                ham = np.hamming(len(frames[i]))
-                hammered = frames[i] * ham
-                a, b, *_ = plt.acorr(hammered, maxlags=maxlags)
-            else:
-                a, b, *_ = plt.acorr(frames[i], maxlags=maxlags) #we only need b, aka the autocorrelation vector
+            a, b, *_ = plt.acorr(frames[i], maxlags=maxlags) #we only need b, aka the autocorrelation vector
 
             e = argrelextrema(b, np.greater)  #Local maximum of b, the autocorrelation vector
             loc_max_temp = np.array(e[0]) #temp list
@@ -137,20 +135,23 @@ def formant (frames):
 
     formanttab = []
     for i in range(0, len(frames)):
+
         filt_frame = highPassFilter(frames[i])
         temp = lpc_ref(filt_frame, order=10)
         lpc = np.roots(temp)
         lpc = lpc[np.imag(lpc) >= 0]
+
         formanttabframes = []
         for j in range (0,len(lpc)) :
             angle = math.atan2(np.imag(lpc[j]),np.real(lpc[j]))
             freq =(Fs/2*np.pi)*angle
+
             if (freq<20000 and freq>500):
                 formanttabframes.append(freq)
 
-        formanttabframes.sort()
         formanttab.append(formanttabframes)
     formanttab = np.array(formanttab)
+    formanttabframes.sort()
 
     return formanttab
 if __name__ == '__main__':
@@ -165,7 +166,7 @@ if __name__ == '__main__':
 
     sig_normed = norm(file)
 
-    frames = framing(sig_normed,round(Fs/100),round(Fs/30))
+    frames = framing(sig_normed,round(Fs/100),round(Fs/30),hamming= True)
 
     p = pitch(frames,Fs,maxlags=round(Fs/50))
 
