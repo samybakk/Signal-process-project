@@ -166,26 +166,28 @@ if __name__ == '__main__':
     filesM = []
     filesF = []
     for i in range(15) :
-        fileM = random.choice(os.listdir(pathM))
-        fileF = random.choice(os.listdir(pathF))
+        file = random.choice(os.listdir(pathM))
 
-        Fs, rawfileM = read(pathM+fileM)
-        Fs2, rawfileF = read(pathF+fileF)
+        Fs, rawfileM = read(pathM+file)
+        Fs2, rawfileF = read(pathF+file)
 
-        filesM.append(rawfileM, dtype=float)
-        filesF.append(rawfileF, dtype=float)
+        filesM.append(np.array(rawfileM, dtype=float))
+        filesF.append(np.array(rawfileF, dtype=float))
 
     filesM = np.array(filesM)
     filesF = np.array(filesF)
 
-    filesMNormed = norm(filesM)
-    filesFNormed = norm(filesF)
+    filesMNormed = []
+    filesFNormed = []
+    for i in range(len(filesM)) :
+        filesMNormed.append(norm(filesM[i]))
+        filesFNormed.append(norm(filesF[i]))
 
-    framesM = framing(filesM,round(Fs/100),round(Fs/30),hamming= True)
-    framesF = framing(filesF,round(Fs/100),round(Fs/30),hamming= True)
+        framesM = framing(filesM,round(Fs/100),round(Fs/30),hamming= True)
+        framesF = framing(filesF,round(Fs/100),round(Fs/30),hamming= True)
 
-    pitchM = pitch(framesM,Fs,maxlags = round(Fs/50))
-    pitchF = pitch(framesF,Fs,maxlags = round(Fs/50))
+        pitchM = pitch(framesM,Fs,maxlags = round(Fs/50))
+        pitchF = pitch(framesF,Fs,maxlags = round(Fs/50))
 
     formantM = formant(framesM)
     formantF = formant(framesF)
