@@ -183,8 +183,10 @@ if __name__ == '__main__':
         filesMNormed.append(norm(filesM[i]))
         filesFNormed.append(norm(filesF[i]))
 
-        framesM = framing(filesM,round(Fs/100),round(Fs/30),hamming= True)
-        framesF = framing(filesF,round(Fs/100),round(Fs/30),hamming= True)
+        framesM = framing(filesMNormed,round(Fs/100),round(Fs/30),hamming= True)
+        framesF = framing(filesFNormed,round(Fs/100),round(Fs/30),hamming= True)
+        framesM = framesM[0]
+        framesF = framesF[0]
 
         pitchM = pitch(framesM,Fs,maxlags = round(Fs/50))
         pitchF = pitch(framesF,Fs,maxlags = round(Fs/50))
