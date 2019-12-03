@@ -1,13 +1,13 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.signal as sc
-from scipy.signal import argrelextrema
+from scipy.signal import argrelextrema, lfilter
 from scipy.io.wavfile import read
 from scipy.io.wavfile import write
 import os
 import random
 from scikit_talkbox_lpc import lpc_ref
-import math
+
 
 
 def norm(signal):
@@ -131,26 +131,28 @@ def highPassFilter(signal, preamphaStep=0.67) :
     filteredSig = np.array(filteredSig)
     return filteredSig
 
+
 def formant (frames):
 
     formanttab = []
     for i in range(0, len(frames)):
 
         filt_frame = highPassFilter(frames[i])
-        temp = lpc_ref(filt_frame, order=10)
+        temp = lpc_ref(filt_frame, order= 10)
         lpc = np.roots(temp)
         lpc = lpc[np.imag(lpc) >= 0]
-
+        formanttabframe = []
         for j in range (0,len(lpc)) :
-            angle = math.atan2(np.imag(lpc[j]),np.real(lpc[j]))
-            freq =(Fs/2*np.pi)*angle
+            angle = np.arctan2(np.imag(lpc[j]),np.real(lpc[j]))
+            freq =angle*(Fs/8*np.pi)
 
-            if (freq<2000000 and freq>10):
-                print(freq)
-                formanttab.append(freq)
+            if (freq<20000 and freq>500):
+                formanttabframe.append(freq)
+                formanttabframe.sort()
+        formanttab.append((formanttabframe))
 
     formanttab = np.array(formanttab)
-    formanttab= np.sort(formanttab)
+    formanttab = np.sort(formanttab)
 
     return formanttab
 if __name__ == '__main__':
@@ -170,6 +172,6 @@ if __name__ == '__main__':
     p = pitch(frames,Fs,maxlags=round(Fs/50))
 
     f = formant(frames)
-
+    print (f)
 
 

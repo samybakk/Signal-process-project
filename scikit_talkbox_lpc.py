@@ -90,7 +90,7 @@ def levinson_1d(r, order):
     a[0] = 1.
     e = r[0]
 
-    for i in xrange(1, order+1):
+    for i in range(1, order+1):
         acc = r[i]
         for j in range(1, i):
             acc += a[j] * r[i-j]
