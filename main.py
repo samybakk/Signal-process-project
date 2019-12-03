@@ -141,22 +141,21 @@ def formant (frames):
         lpc = np.roots(temp)
         lpc = lpc[np.imag(lpc) >= 0]
 
-        formanttabframes = []
         for j in range (0,len(lpc)) :
             angle = math.atan2(np.imag(lpc[j]),np.real(lpc[j]))
             freq =(Fs/2*np.pi)*angle
 
-            if (freq<20000 and freq>500):
-                formanttabframes.append(freq)
+            if (freq<2000000 and freq>10):
+                print(freq)
+                formanttab.append(freq)
 
-        formanttab.append(formanttabframes)
     formanttab = np.array(formanttab)
-    formanttabframes.sort()
+    formanttab= np.sort(formanttab)
 
     return formanttab
 if __name__ == '__main__':
 
-    path = ""
+    path = "C://Users//frost//Documents//BA3//signal processing//sig//"
 
     randomfile = random.choice(os.listdir(path))
 
@@ -171,6 +170,6 @@ if __name__ == '__main__':
     p = pitch(frames,Fs,maxlags=round(Fs/50))
 
     f = formant(frames)
-    print(f)
+
 
 
